@@ -14,6 +14,9 @@ func main() {
 	godotenv.Load()
 
 	port := ":" + os.Getenv("APP_PORT")
+	if port == "" {
+		port = "8080"
+	}
 
 	database.ConnectDB()
 

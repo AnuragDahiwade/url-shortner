@@ -48,7 +48,7 @@ func ShortenURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := map[string]string{
-		"short_url": "http://localhost:8080/" + shortCode,
+		"short_url": "https://" + r.Host + "/" + shortCode,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
