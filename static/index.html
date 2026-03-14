@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+  <head>
+    <title>URL Shortener</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f7f3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      /* Card */
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        width: 420px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Title */
+      h2 {
+        color: #4caf50;
+      }
+
+      /* Input */
+      input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+
+      /* Buttons */
+      button {
+        margin-top: 15px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      /* Primary button */
+      .shorten-btn {
+        background: #4caf50;
+        color: white;
+      }
+
+      .shorten-btn:hover {
+        background: #43a047;
+      }
+
+      /* Copy button */
+      .copy-btn {
+        background: #2e7d32;
+        color: white;
+        margin-left: 10px;
+      }
+
+      .copy-btn:hover {
+        background: #1b5e20;
+      }
+
+      /* Result */
+      .result-box {
+        margin-top: 20px;
+      }
+
+      /* Spinner */
+      .spinner {
+        margin-top: 15px;
+        display: none;
+      }
+
+      .spinner div {
+        width: 20px;
+        height: 20px;
+        border: 3px solid #ccc;
+        border-top: 3px solid #4caf50;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: auto;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Error */
+      .error {
+        color: red;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>🔗 URL Shortener</h2>
+
+      <input id="urlInput" placeholder="Paste your long URL here" />
+
+      <button class="shorten-btn" onclick="shorten()">Shorten URL</button>
+
+      <div class="spinner" id="spinner">
+        <div></div>
+      </div>
+
+      <div class="result-box" id="resultBox"></div>
+
+      <p class="error" id="errorMsg"></p>
+    </div>
+
+    <script>
+      async function shorten() {
+        const url = document.getElementById("urlInput").value;
+        const spinner = document.getElementById("spinner");
+        const resultBox = document.getElementById("resultBox");
+        const errorMsg = document.getElementById("errorMsg");
+
+        resultBox.innerHTML = "";
+        errorMsg.innerText = "";
+
+        if (!url) {
+          errorMsg.innerText = "Please enter a URL.";
+          return;
+        }
+
+        spinner.style.display = "block";
+
+        try {
+          const response = await fetch("http://localhost:8080/shorten", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: url }),
+          });
+
+          spinner.style.display = "none";
+
+          if (!response.ok) {
+            errorMsg.innerText = "Server returned an error.";
+            return;
+          }
+
+          const data = await response.json();
+
+          if (!data.short_url) {
+            errorMsg.innerText = "Invalid server response.";
+            return;
+          }
+
+          resultBox.innerHTML = `
+            <p><b>Your Short URL</b></p>
+            <a id="shortLink" href="${data.short_url}" target="_blank">
+                ${data.short_url}
+            </a>
+            <button class="copy-btn" onclick="copyURL()">Copy</button>
+        `;
+        } catch (err) {
+          spinner.style.display = "none";
+          console.error(err);
+          errorMsg.innerText = "Server error. Please try again.";
+        }
+      }
+      function copyURL() {
+        const text = document.getElementById("shortLink").innerText;
+
+        navigator.clipboard.writeText(text);
+
+        alert("Copied to clipboard!");
+      }
+    </script>
+  </body>
+</html>

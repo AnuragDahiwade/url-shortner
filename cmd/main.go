@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -12,22 +11,16 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load()
 
-	port := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
+	port := ":" + os.Getenv("APP_PORT")
 
 	database.ConnectDB()
 
 	http.HandleFunc("/shorten", handlers.ShortenURL)
 	http.HandleFunc("/", handlers.RedirectURL)
 
-	log.Println("Server running on port", port)
+	log.Println("Server running on", port)
 
-	err = http.ListenAndServe(port, nil)
-	if err != nil {
-		log.Fatal("Server failed to start:", err)
-	}
+	log.Fatal(http.ListenAndServe(port, nil))
 }

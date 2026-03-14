@@ -14,6 +14,11 @@ type request struct {
 
 func ShortenURL(w http.ResponseWriter, r *http.Request) {
 
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	var req request
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -46,5 +51,6 @@ func ShortenURL(w http.ResponseWriter, r *http.Request) {
 		"short_url": "http://localhost:8080/" + shortCode,
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
