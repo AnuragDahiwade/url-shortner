@@ -138,7 +138,7 @@
         spinner.style.display = "block";
 
         try {
-          const response = await fetch("http://localhost:8080/shorten", {
+          const response = await fetch("/shorten", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url: url }),
